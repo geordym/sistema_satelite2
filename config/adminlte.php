@@ -314,9 +314,15 @@ return [
                 ],
                 [
                     'text' => 'Tarifas',
-                    'url'  => '#',
+                    'url'  => '/admin/tarifas',
                 ],
             ],
+        ],
+
+        [
+            'text' => 'Clientes',
+            'url'  => 'admin/clientes',
+            'icon' => 'fas fa-fw fa-user',
         ],
 
         ['header' => 'account_settings'],

@@ -34,3 +34,12 @@ Route::post('/admin/users', [App\Http\Controllers\UserController::class, 'create
 
 /*PLANES DE SERVICIO ROUTES */
 Route::get('/admin/planes', [App\Http\Controllers\PlanController::class, 'index'])->name('admin.planes');
+Route::post('/admin/planes', [App\Http\Controllers\PlanController::class, 'create'])->name('admin.planes.create');
+
+/*TARIFAS ROUTES */
+Route::get('/admin/tarifas', [App\Http\Controllers\TarifaController::class, 'index'])->name('admin.tarifas');
+Route::post('/admin/tarifas', [App\Http\Controllers\TarifaController::class, 'create'])->name('admin.tarifas.create');
+
+/*CLIENTS ROUTES */
+Route::get('/admin/clients', [App\Http\Controllers\ClientController::class, 'index'])->name('admin.clients');
+Route::post('/admin/clients', [App\Http\Controllers\ClientController::class, 'create'])->name('admin.clients.create');

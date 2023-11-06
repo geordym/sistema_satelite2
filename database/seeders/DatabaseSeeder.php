@@ -8,6 +8,9 @@ use Illuminate\Database\Seeder;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Plan;
+use App\Models\Tarifa;
+use App\Models\Client;
 
 class DatabaseSeeder extends Seeder
 {
@@ -48,5 +51,46 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password2'),
             'id_rol' => $role2->id, // Asigna el ID del segundo rol al usuario 2
         ]);
+
+        Plan::create([
+            'name' => 'INTERNET 4MB',
+            'description' => 'ACCeSO A Internet',
+            'cost' => 200,
+        ]);
+
+        Plan::create([
+            'name' => 'INTERNET 8MB',
+            'description' => 'ACCeSO A Internet',
+            'cost' => 200,
+        ]);
+
+        Plan::create([
+            'name' => 'INTERNET 24MB',
+            'description' => 'ACCeSO A Internet',
+            'cost' => 200,
+        ]);
+
+        Tarifa::create([
+            'name' => 'AFILIACION',
+            'description' => 'COSTO DE AFILIARSE',
+            'cost' => 200,
+        ]);
+
+        Tarifa::create([
+            'name' => 'RECONEXION',
+            'description' => 'Costo por reconectar servicio',
+            'cost' => 200,
+        ]);
+
+        Client::create([
+            'names' => 'LUIS PEREZ',
+            'surnames' => 'TORReS CARRILLO',
+            'phone' => 3024124124,
+            'email' => 'ggear@gmail.com',
+            'address' => 'AV calle 4',
+            'id_type' => 'CEDULA CIUDADANIA',
+            'identification' => 214214124
+        ]);
+
     }
 }

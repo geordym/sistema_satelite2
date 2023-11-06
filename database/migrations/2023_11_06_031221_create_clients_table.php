@@ -13,13 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('planes', function (Blueprint $table) {
+        Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('descripcion');
-            $table->decimal('cost', 10, 2); // '10, 2' indica 10 dígitos en total y 2 decimales
+            $table->string('names');
+            $table->string('surnames');
+            $table->unsignedBigInteger('phone');
+            $table->string('email');
+            $table->string('address');
+            $table->string('id_type');
+            $table->unsignedBigInteger('identification');
             $table->timestamps();
-            $table->boolean('status'); // Crea un campo booleano
         });
     }
 
@@ -30,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('table_servicios');
+        Schema::dropIfExists('clients');
     }
 };
