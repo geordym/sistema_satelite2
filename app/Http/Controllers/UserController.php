@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -38,6 +39,11 @@ class UserController extends Controller
 
         return redirect('/admin/users');
 
+    }
+
+    public function logout(){
+        Auth::logout(); // Cierra la sesión del usuario
+        return redirect('/login'); // Redirige al usuario a la página de inicio de sesión o a la página que desees después del cierre de sesión.
     }
 
 
