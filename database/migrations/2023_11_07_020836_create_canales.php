@@ -15,6 +15,11 @@ return new class extends Migration
     {
         Schema::create('canales', function (Blueprint $table) {
             $table->id();
+            $table->string('key');
+            $table->string('value');
+            $table->string('type');
+            $table->unsignedBigInteger('number')->nullable();
+            $table->boolean('habilitado')->default(true);
             $table->timestamps();
         });
     }

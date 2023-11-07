@@ -6,11 +6,9 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 
-use App\Models\Role;
+use App\Models\Canal;
 use App\Models\User;
-use App\Models\Plan;
-use App\Models\Tarifa;
-use App\Models\Client;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -36,6 +34,23 @@ class DatabaseSeeder extends Seeder
             'name' => 'User 2',
             'email' => 'user2@example.com',
             'password' => bcrypt('password2'),
+        ]);
+
+
+        Canal::create([
+            'key' => 'canal 1',
+            'value' => 'asdsadasd',
+            'type' => 'test1',
+            'number' => 123
+
+        ]);
+
+        Canal::create([
+            'key' => 'canal 1',
+            'value' => 'asdsadasd',
+            'type' => 'test1',
+            'number' => 1
+
         ]);
 
 
