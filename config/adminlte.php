@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>Sistema Cobranzas</b>',
+    'logo' => '<b>Sistema IPTV</b>',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
@@ -304,55 +304,13 @@ return [
         // Sidebar items:
 
         ['header' => 'Modulos'],
-        [
-            'text'    => 'Planes/Tarifas',
-            'icon'    => 'fas fa-fw fa-share',
-            'submenu' => [
-                [
-                    'text' => 'Planes de servicio',
-                    'url'  => '/admin/planes',
-                ],
-                [
-                    'text' => 'Tarifas',
-                    'url'  => '/admin/tarifas',
-                ],
-            ],
-        ],
 
         [
-            'text' => 'Clientes',
-            'url'  => 'admin/clientes',
-            'icon' => 'fas fa-fw fa-user',
+            'text' => 'Canales XML',
+            'url'  => '/admin/canales',
         ],
 
-        ['header' => 'account_settings'],
-        [
-            'text' => 'profile',
-            'url'  => 'admin/profile',
-            'icon' => 'fas fa-fw fa-user',
-        ],
-        [
-            'text' => 'Crear Usuarios',
-            'url'  => 'admin/users',
-            'icon' => 'fas fa-fw fa-user',
-        ],
 
-        ['header' => 'labels'],
-        [
-            'text'       => 'important',
-            'icon_color' => 'red',
-            'url'        => '#',
-        ],
-        [
-            'text'       => 'warning',
-            'icon_color' => 'yellow',
-            'url'        => '#',
-        ],
-        [
-            'text'       => 'information',
-            'icon_color' => 'cyan',
-            'url'        => '#',
-        ],
     ],
 
     /*
