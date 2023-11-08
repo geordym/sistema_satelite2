@@ -31,6 +31,10 @@
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createUserModal">
             Crear Canal
         </button>
+
+        <a class="btn btn-warning ml-4" href="{{route('admin.canales.xml')}}">
+            Actualizar archivo de canales
+        </a>
     </div>
     <div class="row bg-white mt-3" style="max-height: 500px; overflow: auto;">
         <table class="table table-bordered">
@@ -75,13 +79,13 @@
                     <td>{{ $canal->type }}</td>
                     <td>{{ $canal->number }}</td> <!-- Asumiendo que tienes una relación BelongsTo con el rol -->
                     <td>
-                    {{$estado}}
+                        {{$estado}}
                     </td>
 
                     <td>
 
                         <a class=" btn btn-info" href="{{route('admin.canales.edit', $canal->id)}}">Actualizar</a>
-                    <a id="deleteLink" class="btn btn-danger ml-4" href="{{ route('admin.canales.delete', $canal->id) }}">Eliminar</a>
+                        <a id="deleteLink" class="btn btn-danger ml-4" href="{{ route('admin.canales.delete', $canal->id) }}">Eliminar</a>
 
                     </td>
                 </tr>
@@ -195,7 +199,7 @@
             }).then(response => {
                 if (response.status === 200) {
                     // Éxito: redirige o muestra un mensaje de éxito
-                    window.location.href = '{{ route('admin.canales')}}';
+                    window.location.href = "{{ route('admin.canales')}}" ;
                 } else {
                     // Error: muestra un mensaje de error o maneja la respuesta
                     alert('Error al eliminar el canal.');

@@ -32,11 +32,14 @@ Route::post('/admin/users', [App\Http\Controllers\UserController::class, 'create
 
 
 /*CANALES ROUTES */
+Route::get('/admin/canales/xml', [App\Http\Controllers\CanalController::class, 'generarXML'])->name('admin.canales.xml');
 Route::delete('/admin/canales/delete/{id}', [App\Http\Controllers\CanalController::class, 'destroy'])->name('admin.canales.delete');
 Route::get('/admin/canales', [App\Http\Controllers\CanalController::class, 'index'])->name('admin.canales');
 Route::post('/admin/canales', [App\Http\Controllers\CanalController::class, 'create'])->name('admin.canales.create');
 Route::get('/admin/canales/edit/{id}', [App\Http\Controllers\CanalController::class, 'edit'])->name('admin.canales.edit');
 Route::put('/admin/canales/{id}', [App\Http\Controllers\CanalController::class, 'update'])->name('admin.canales.update');
+
+
 
 /*CLIENTS ROUTES */
 Route::get('/admin/clients', [App\Http\Controllers\ClientController::class, 'index'])->name('admin.clients');

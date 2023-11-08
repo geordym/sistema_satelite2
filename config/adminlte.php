@@ -306,7 +306,7 @@ return [
         ['header' => 'Modulos'],
 
         [
-            'text' => 'Canales XML',
+            'text' => 'Canales IPTV',
             'url'  => '/admin/canales',
         ],
 

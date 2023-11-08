@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Canal;
-
+use Exception;
 
 class CanalController extends Controller
 {
@@ -133,21 +133,19 @@ class CanalController extends Controller
             $item1->addChild('value', $canal->value);
             $item1->addChild('type', $canal->type);
 
-            if($canal->number != 0){
+            if ($canal->number != 0) {
                 $item1->addChild('number', $canal->number);
             }
         }
-
-
-        // Convierte el objeto SimpleXMLElement en una cadena XML
         $xmlString = $xml->asXML();
-
-        // Establecer el tipo de contenido de la respuesta como XML
-        $headers = array(
-            'Content-Type' => 'application/xml',
-        );
-
+        try {
+            $archivo_canales = fopen($this->xml_ruta, "w");
+            fwrite($archivo_canales, $xmlString);
+            fclose($archivo_canales);
+        } catch (Exception $e) {
+            echo 'Exception: ' . $e;
+        }
         // Devolver una respuesta HTTP con el contenido XML
-        return response($xmlString, 200, $headers);
+        return redirect()->route('admin.canales')->with('success', 'El archivo de canales se ha actualizado exitosamente.');
     }
 }
