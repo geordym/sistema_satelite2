@@ -10,8 +10,11 @@ use Exception;
 class CanalController extends Controller
 {
     //
-    public $xml_ruta = 'C:\xampp\htdocs\iptv_app\base.xml';
+    public $xml_ruta = "";
 
+    public function __construct() {
+        $this->xml_ruta = env('XML_FILE_DIR');
+    }
 
 
     private function cargarCanales()
@@ -19,7 +22,10 @@ class CanalController extends Controller
         $xml = $this->xml_ruta;
         $canales = [];
 
+
+        try{
         if (file_exists($xml)) {
+
             $xml = simplexml_load_file($xml);
             if ($xml) {
                 if (isset($xml->item)) {
@@ -47,6 +53,10 @@ class CanalController extends Controller
                 echo "No se pudo cargar el XML.";
             }
         }
+    }catch(Exception $e){
+        return $canales;
+    }
+
     }
 
     public function create(Request $request)
