@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    // Redirige a la ruta '/home'
+    return redirect('/home');
 });
 
 Auth::routes();
