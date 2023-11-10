@@ -120,13 +120,8 @@ class CanalController extends Controller
     {
 
         $canales_habilitados = Canal::where('habilitado', 1)->get();
-
-
         // Crear un nuevo objeto SimpleXMLElement con una raíz llamada "list"
         $xml = new \SimpleXMLElement('<?xml version="1.0"?> <?GXxml version=1.0?> <list></list>');
-
-        // Crear el primer elemento "item"
-
         foreach ($canales_habilitados as $canal) {
             $item1 = $xml->addChild('item');
             $item1->addChild('key', $canal->key);
@@ -148,4 +143,9 @@ class CanalController extends Controller
         // Devolver una respuesta HTTP con el contenido XML
         return redirect()->route('admin.canales')->with('success', 'El archivo de canales se ha actualizado exitosamente.');
     }
+
+    function retornarXML(){
+        return response()->file($this->xml_ruta);
+    }
+
 }

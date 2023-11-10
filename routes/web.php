@@ -40,6 +40,10 @@ Route::get('/admin/canales/edit/{id}', [App\Http\Controllers\CanalController::cl
 Route::put('/admin/canales/{id}', [App\Http\Controllers\CanalController::class, 'update'])->name('admin.canales.update');
 
 
+Route::get('canales/canales.xml', [App\Http\Controllers\CanalController::class, 'retornarXML'])->name('admin.canales.xml');
+
+
+
 
 /*CLIENTS ROUTES */
 Route::get('/admin/clients', [App\Http\Controllers\ClientController::class, 'index'])->name('admin.clients');

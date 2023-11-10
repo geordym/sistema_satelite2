@@ -85,7 +85,7 @@
                     <td>
 
                         <a class=" btn btn-info" href="{{route('admin.canales.edit', $canal->id)}}">Actualizar</a>
-                        <a id="deleteLink" class="btn btn-danger ml-4" href="{{ route('admin.canales.delete', $canal->id) }}">Eliminar</a>
+                        <a class="btn btn-danger ml-4 deleteLink" href="{{ route('admin.canales.delete', $canal->id) }}">Eliminar</a>
 
                     </td>
                 </tr>
@@ -186,26 +186,28 @@
 </div>
 
 <script>
-    document.getElementById('deleteLink').addEventListener('click', function(event) {
-        event.preventDefault(); // Evitar el comportamiento predeterminado del enlace
+    document.querySelectorAll('.deleteLink').forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault(); // Evitar el comportamiento predeterminado del enlace
 
-        if (confirm('¿Estás seguro de que deseas eliminar este canal?')) {
-            // Enviar una solicitud DELETE al servidor
-            fetch(event.target.href, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}' // Agrega el token CSRF
-                }
-            }).then(response => {
-                if (response.status === 200) {
-                    // Éxito: redirige o muestra un mensaje de éxito
-                    window.location.href = "{{ route('admin.canales')}}" ;
-                } else {
-                    // Error: muestra un mensaje de error o maneja la respuesta
-                    alert('Error al eliminar el canal.');
-                }
-            });
-        }
+            if (confirm('¿Estás seguro de que deseas eliminar este canal?')) {
+                // Enviar una solicitud DELETE al servidor
+                fetch(event.target.href, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}' // Agrega el token CSRF
+                    }
+                }).then(response => {
+                    if (response.status === 200) {
+                        // Éxito: redirige o muestra un mensaje de éxito
+                        window.location.href = "{{ route('admin.canales') }}";
+                    } else {
+                        // Error: muestra un mensaje de error o maneja la respuesta
+                        alert('Error al eliminar el canal.');
+                    }
+                });
+            }
+        });
     });
 </script>
 
