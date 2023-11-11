@@ -48,9 +48,11 @@ class CanalController extends Controller
                     return $canales;
                 } else {
                     echo "El elemento <item> no existe en el XML.";
+                    return $canales;
                 }
             } else {
-                echo "No se pudo cargar el XML.";
+                echo "No se pudo cargar el XML, no hay canales.";
+                return $canales;
             }
         }
     }catch(Exception $e){
