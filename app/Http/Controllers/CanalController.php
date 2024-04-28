@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Caja;
+use App\Models\CajaRegistro;
 use Illuminate\Http\Request;
 
 use App\Models\Canal;
@@ -11,9 +13,12 @@ class CanalController extends Controller
 {
     //
     public $xml_ruta = "";
+    public $xml_empty_ruta = "";
 
-    public function __construct() {
-        $this->xml_ruta = env('XML_FILE_DIR');
+    public function __construct()
+    {
+        $this->xml_ruta = env('XML_FILE_DIR', 'C:\xampp\htdocs\iptv_app\base.xml');
+        $this->xml_empty_ruta = env('XML_EMPTY_FILE_DIR', 'C:\xampp\htdocs\iptv_app\base_empty.xml');
     }
 
 
@@ -22,43 +27,44 @@ class CanalController extends Controller
         $xml = $this->xml_ruta;
         $canales = [];
 
+        //dd($xml);
+        try {
+            if (file_exists($xml)) {
 
-        try{
-        if (file_exists($xml)) {
+                $xml = simplexml_load_file($xml);
+                if ($xml) {
+                    if (isset($xml->item)) {
+                        foreach ($xml->item as $item) {
+                            $keyValue = strval($item->key);
+                            $numberValue = strval($item->number); // Obtiene el valor de $item->number como una cadena
+                            $valueValue = strval($item->value); // Obtiene el valor de $item->value como una cadena
+                            $typeValue = strval($item->type); // Obtiene el valor de $item->type como una cadena
 
-            $xml = simplexml_load_file($xml);
-            if ($xml) {
-                if (isset($xml->item)) {
-                    foreach ($xml->item as $item) {
-                        $keyValue = strval($item->key);
-                        $numberValue = strval($item->number); // Obtiene el valor de $item->number como una cadena
-                        $valueValue = strval($item->value); // Obtiene el valor de $item->value como una cadena
-                        $typeValue = strval($item->type); // Obtiene el valor de $item->type como una cadena
+                            $canal = [
+                                "key" => $keyValue,
+                                "number" => $numberValue,
+                                "value" => $valueValue,
+                                "type" => $typeValue
+                            ];
 
-                        $canal = [
-                            "key" => $keyValue,
-                            "number" => $numberValue,
-                            "value" => $valueValue,
-                            "type" => $typeValue
-                        ];
+                            $canales[] = $canal;
+                        }
 
-                        $canales[] = $canal;
+                        return $canales;
+                    } else {
+
+                        echo "El elemento <item> no existe en el XML.";
+                        return $canales;
                     }
-
-                    return $canales;
                 } else {
-                    echo "El elemento <item> no existe en el XML.";
+                    echo "No se pudo cargar el XML, no hay canales.";
+
                     return $canales;
                 }
-            } else {
-                echo "No se pudo cargar el XML, no hay canales.";
-                return $canales;
             }
+        } catch (Exception $e) {
+            return $canales;
         }
-    }catch(Exception $e){
-        return $canales;
-    }
-
     }
 
     public function create(Request $request)
@@ -81,6 +87,9 @@ class CanalController extends Controller
     public function index(Request $request)
     {
         $canales_instalados = $this->cargarCanales();
+        if ($canales_instalados === null) {
+            $canales_instalados = [];
+        }
         $canales = Canal::all();
         return view('canales.index')->with('canales', $canales)->with('canales_instalados', $canales_instalados);
     }
@@ -156,8 +165,32 @@ class CanalController extends Controller
         return redirect()->route('admin.canales')->with('success', 'El archivo de canales se ha actualizado exitosamente.');
     }
 
-    function retornarXML(){
-        return response()->file($this->xml_ruta);
+    function retornarXML(Request $request)
+    {
+
+        $ip = $request->ip();
+        $caja_registro = new CajaRegistro;
+        $caja_registro->ip = $ip;
+        $caja_registro->save();
+
+        $caja = Caja::where('ip', $ip)->first();
+
+        if (!$caja) {
+            return response()->file($this->xml_empty_ruta);
+        }
+
+        $estado = $caja->estado;
+
+        if ($estado === "activado") {
+            return response()->file($this->xml_ruta);
+        } else {
+            return response()->file($this->xml_empty_ruta);
+        }
+
+
     }
+
+
+
 
 }

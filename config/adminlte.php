@@ -309,6 +309,10 @@ return [
             'text' => 'Canales IPTV',
             'url'  => '/admin/canales',
         ],
+        [
+            'text' => 'Cajas',
+            'url'  => '/admin/cajas',
+        ],
 
         [
             'text' => 'Acceso',
