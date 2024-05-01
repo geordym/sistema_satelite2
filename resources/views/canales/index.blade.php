@@ -40,9 +40,9 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>KEY</th>
-                    <th>VALUE</th>
-                    <th>TYPE</th>
+                    <th>Nombre</th>
+                    <th>URL</th>
+                    <th>Categoria</th>
                     <th>NUMBER</th>
                     <th>Estado</th>
                     <th>Acciones</th>
@@ -112,9 +112,9 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>KEY</th>
-                    <th>VALUE</th>
-                    <th>TYPE</th>
+                    <th>Nombre</th>
+                    <th>URL</th>
+                    <th>Categoria</th>
                     <th>NUMBER</th>
 
                 </tr>
@@ -156,15 +156,15 @@
                 <form action="{{route('admin.canales.create')}}" method="POST">
                     @csrf
                     <div class="form-group">
-                        <label for="name">Key:</label>
+                        <label for="name">Nombre:</label>
                         <input type="text" class="form-control" id="key" name="key" required>
                     </div>
                     <div class="form-group">
-                        <label for="email">Value:</label>
+                        <label for="email">URL:</label>
                         <input type="text" class="form-control" id="value" name="value" required>
                     </div>
                     <div class="form-group">
-                        <label for="rol">Type:</label>
+                        <label for="rol">Categoria:</label>
                         <input type="text" class="form-control" id="type" name="type" required>
 
                     </div>
