@@ -138,32 +138,37 @@ class CanalController extends Controller
 
 
     public function generarXML()
-    {
+{
+    $canales_habilitados = Canal::where('habilitado', 1)->get();
+    
+    // Crear un nuevo objeto SimpleXMLElement con una raíz llamada "list"
+    $xml = new \SimpleXMLElement('<?xml version="1.0"?><list></list>');
 
-        $canales_habilitados = Canal::where('habilitado', 1)->get();
-        // Crear un nuevo objeto SimpleXMLElement con una raíz llamada "list"
-        $xml = new \SimpleXMLElement('<?xml version="1.0"?> <?GXxml version=1.0?> <list></list>');
-        foreach ($canales_habilitados as $canal) {
-            $item1 = $xml->addChild('item');
-            $item1->addChild('key', $canal->key);
-            $item1->addChild('value', $canal->value);
-            $item1->addChild('type', $canal->type);
+    foreach ($canales_habilitados as $canal) {
+        $item1 = $xml->addChild('item');
+        $item1->addChild('key', htmlspecialchars($canal->key, ENT_XML1, 'UTF-8'));
+        $item1->addChild('value', htmlspecialchars($canal->value, ENT_XML1, 'UTF-8'));
+        $item1->addChild('type', htmlspecialchars($canal->type, ENT_XML1, 'UTF-8'));
 
-            if ($canal->number != 0) {
-                $item1->addChild('number', $canal->number);
-            }
+        if ($canal->number != 0) {
+            $item1->addChild('number', $canal->number);
         }
-        $xmlString = $xml->asXML();
-        try {
-            $archivo_canales = fopen($this->xml_ruta, "w");
-            fwrite($archivo_canales, $xmlString);
-            fclose($archivo_canales);
-        } catch (Exception $e) {
-            echo 'Exception: ' . $e;
-        }
-        // Devolver una respuesta HTTP con el contenido XML
-        return redirect()->route('admin.canales')->with('success', 'El archivo de canales se ha actualizado exitosamente.');
     }
+
+    $xmlString = $xml->asXML();
+
+    try {
+        $archivo_canales = fopen($this->xml_ruta, "w");
+        fwrite($archivo_canales, $xmlString);
+        fclose($archivo_canales);
+    } catch (Exception $e) {
+        echo 'Exception: ' . $e;
+    }
+
+    // Devolver una respuesta HTTP con el contenido XML
+    return redirect()->route('admin.canales')->with('success', 'El archivo de canales se ha actualizado exitosamente.');
+}
+
 
     function retornarXML(Request $request)
     {
