@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('cajas', function (Blueprint $table) {
             $table->id();
-            $table->string('ip');
+            $table->string('mac');
             $table->string('nombre');
             $table->enum('estado', ['activado', 'desactivado'])->default('desactivado');
             $table->timestamps();
