@@ -122,7 +122,7 @@ class CajaController extends Controller
         ]);
 
         $request->validate([
-            'mac' => ['required', new MacAddress, Rule::unique('cajas', 'mac')],
+            'mac' => ['required', new MacAddress],
         ]);
 
         // Comprobar si la validación falla
