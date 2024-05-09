@@ -185,7 +185,6 @@ class CanalController extends Controller
         }
 
         $estado = $caja->estado;
-        echo "MAC RECIBIDA: " . $mac;
 
         if ($estado === "activado") {
             return response()->file($this->xml_ruta);
