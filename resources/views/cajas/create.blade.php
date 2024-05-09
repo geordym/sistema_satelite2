@@ -25,8 +25,8 @@
     <form action="{{ route('cajas.store') }}" method="POST">
         @csrf
         <div class="form-group">
-            <label for="ip">IP:</label>
-            <input type="text" class="form-control" id="ip" name="ip" value="{{$ip}}" required>
+            <label for="MAC">MAC:</label>
+            <input type="text" class="form-control" id="mac" name="mac" value="{{$mac}}" required>
         </div>
         <div class="form-group">
             <label for="nombre">Nombre:</label>

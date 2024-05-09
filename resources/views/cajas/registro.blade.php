@@ -22,7 +22,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>IP</th>
+                <th>MAC</th>
                 <th>Fecha</th>
                 <th>Acciones</th>
 
@@ -31,12 +31,12 @@
         <tbody>
             @foreach ($cajas_registro as $caja)
             <tr>
-                <td>{{ $caja->ip }}</td>
+                <td>{{ $caja->mac }}</td>
                 <td>{{ $caja->created_at }}</td>
 
 
                 <td>
-                <a class="btn btn-warning" href="{{ route('cajas.create', ['ip' => $caja->ip]) }}">Crear</a>
+                <a class="btn btn-warning" href="{{ route('cajas.create', ['mac' => $caja->mac]) }}">Crear</a>
                 </td>
 
             </tr>

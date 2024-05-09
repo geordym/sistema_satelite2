@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Caja;
 use App\Models\CajaRegistro;
+use App\Rules\MacAddress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -43,8 +44,8 @@ class CajaController extends Controller
      */
     public function create(Request $request)
     {
-        $ip = $request->input('ip');
-        return view('cajas.create')->with('ip', $ip);
+        $mac = $request->input('mac');
+        return view('cajas.create')->with('mac', $mac);
     }
 
     /**
@@ -57,9 +58,12 @@ class CajaController extends Controller
     {
         // Validación de los datos recibidos
         $validator = Validator::make($request->all(), [
-            'ip' => ['required', 'ip', Rule::unique('cajas', 'ip')],
             'nombre' => 'required|string',
             'estado' => 'required|in:activado,desactivado',
+        ]);
+
+        $request->validate([
+            'mac' => ['required', new MacAddress, Rule::unique('cajas', 'mac')],
         ]);
 
         // Comprobar si la validación falla
@@ -69,7 +73,7 @@ class CajaController extends Controller
 
         // Crear una nueva instancia de Caja
         $caja = new Caja();
-        $caja->ip = $request->ip;
+        $caja->mac = $request->mac;
         $caja->nombre = $request->nombre;
         $caja->estado = $request->estado;
         $caja->save();
@@ -113,12 +117,13 @@ class CajaController extends Controller
 
         // Validación de los datos recibidos
         $validator = Validator::make($request->all(), [
-            'ip' => 'required|ip',
             'nombre' => 'required|string',
             'estado' => 'required|in:activado,desactivado',
         ]);
 
-
+        $request->validate([
+            'mac' => ['required', new MacAddress, Rule::unique('cajas', 'mac')],
+        ]);
 
         // Comprobar si la validación falla
         if ($validator->fails()) {
@@ -129,7 +134,7 @@ class CajaController extends Controller
         $caja = Caja::findOrFail($id);
 
         // Actualizar los valores de la caja
-        $caja->ip = $request->ip;
+        $caja->mac = $request->mac;
         $caja->nombre = $request->nombre;
         $caja->estado = $request->estado;
         $caja->save();

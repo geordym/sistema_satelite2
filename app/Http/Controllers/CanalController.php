@@ -17,8 +17,8 @@ class CanalController extends Controller
 
     public function __construct()
     {
-        $this->xml_ruta = env('XML_FILE_DIR', 'C:\xampp\htdocs\iptv_app\base.xml');
-        $this->xml_empty_ruta = env('XML_EMPTY_FILE_DIR', 'C:\xampp\htdocs\iptv_app\base_empty.xml');
+        $this->xml_ruta = env('XML_FILE_DIR');
+        $this->xml_empty_ruta = env('XML_EMPTY_FILE_DIR');
     }
 
 
@@ -140,7 +140,7 @@ class CanalController extends Controller
     public function generarXML()
 {
     $canales_habilitados = Canal::where('habilitado', 1)->get();
-    
+
     // Crear un nuevo objeto SimpleXMLElement con una raíz llamada "list"
     $xml = new \SimpleXMLElement('<?xml version="1.0"?><list></list>');
 
@@ -173,24 +173,27 @@ class CanalController extends Controller
     function retornarXML(Request $request)
     {
 
-        $ip = $request->ip();
+        $mac = $request->input('mac') ?? '00:00:00:00:00:00';
         $caja_registro = new CajaRegistro;
-        $caja_registro->ip = $ip;
+        $caja_registro->mac = $mac;
         $caja_registro->save();
 
-        $caja = Caja::where('ip', $ip)->first();
+        $caja = Caja::where('mac', $mac)->first();
 
         if (!$caja) {
             return response()->file($this->xml_empty_ruta);
         }
 
         $estado = $caja->estado;
+        echo "MAC RECIBIDA: " . $mac;
 
         if ($estado === "activado") {
             return response()->file($this->xml_ruta);
         } else {
             return response()->file($this->xml_empty_ruta);
         }
+
+
 
 
     }

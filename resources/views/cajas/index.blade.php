@@ -58,7 +58,7 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>IP</th>
+                <th>MAC</th>
                 <th>Nombre</th>
                 <th>Estado</th>
                 <th>Acciones</th>
@@ -69,7 +69,7 @@
             @foreach ($cajas as $caja)
             <tr>
                 <td>{{ $caja->id }}</td>
-                <td>{{ $caja->ip }}</td>
+                <td>{{ $caja->mac }}</td>
                 <td>{{ $caja->nombre }}</td>
                 <td>
                     @if ($caja->estado == 'activado')

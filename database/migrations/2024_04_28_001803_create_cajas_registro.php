@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('cajas_registro', function (Blueprint $table) {
             $table->id();
-            $table->string('ip');
+            $table->string('mac');
             $table->timestamps();
         });
     }

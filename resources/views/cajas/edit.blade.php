@@ -25,8 +25,8 @@
         @method('PUT') <!-- Método para actualizar el registro -->
 
         <div class="form-group">
-            <label for="ip">IP:</label>
-            <input type="text" class="form-control" id="ip" name="ip" value="{{ $caja->ip }}" required>
+            <label for="mac">MAC:</label>
+            <input type="text" class="form-control" id="mac" name="mac" value="{{ $caja->mac }}" required>
         </div>
         <div class="form-group">
             <label for="nombre">Nombre:</label>
