@@ -17,8 +17,8 @@ class CanalController extends Controller
 
     public function __construct()
     {
-        $this->xml_ruta = env('XML_FILE_DIR');
-        $this->xml_empty_ruta = env('XML_EMPTY_FILE_DIR');
+        $this->xml_ruta = env('XML_FILE_DIR', '/var/www/html/canales/canales.xml');
+        $this->xml_empty_ruta = env('XML_EMPTY_FILE_DIR', '/var/www/html/canales/canales_empty.xml');
     }
 
 
