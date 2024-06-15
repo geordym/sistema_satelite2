@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Actividad;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -37,22 +38,26 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        Canal::create([
-            'key' => 'canal 1',
-            'value' => 'asdsadasd',
-            'type' => 'test1',
-            'number' => 123
-
+        Actividad::create([
+            'nombre' => 'Fileteado Grapado',
+            'valor_unitario' => '26',
         ]);
 
-        Canal::create([
-            'key' => 'canal 1',
-            'value' => 'asdsadasd',
-            'type' => 'test1',
-            'number' => 1
-
+        Actividad::create([
+            'nombre' => 'Fileteado Directo',
+            'valor_unitario' => '54',
         ]);
 
+        Actividad::create([
+            'nombre' => 'Grapado',
+            'valor_unitario' => '26',
+        ]);
+
+
+        Actividad::create([
+            'nombre' => 'Empalillado',
+            'valor_unitario' => '20',
+        ]);
 
 
     }

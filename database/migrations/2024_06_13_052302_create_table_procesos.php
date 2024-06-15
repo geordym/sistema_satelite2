@@ -13,14 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('canales', function (Blueprint $table) {
+        Schema::create('procesos', function (Blueprint $table) {
             $table->id();
-            $table->string('key');
-            $table->string('value');
-            $table->string('type');
-            $table->unsignedBigInteger('number')->nullable();
-            $table->boolean('habilitado')->default(true);
+            $table->unsignedBigInteger('entrada_id'); // Clave foránea para la relación
+            $table->integer('actividad_id'); // Campo para la cantidad
+
             $table->timestamps();
+
+            $table->foreign('actividad_id')->references('id')->on('actividades');
+            $table->foreign('entrada_id')->references('id')->on('entradas');
+
         });
     }
 
@@ -31,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('canales');
+        Schema::dropIfExists('procesos');
     }
 };

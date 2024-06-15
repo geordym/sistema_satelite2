@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>Sistema IPTV</b>',
+    'logo' => '<b>Sistema Satelite</b>',
     'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
@@ -306,16 +306,21 @@ return [
         ['header' => 'Modulos'],
 
         [
-            'text' => 'Canales IPTV',
-            'url'  => '/admin/canales',
+            'text' => 'Entradas',
+            'url'  => '/admin/entradas',
         ],
         [
-            'text' => 'Cajas',
-            'url'  => '/admin/cajas',
+            'text' => 'Procesos',
+            'url'  => '/admin/procesos',
         ],
 
         [
-            'text' => 'Acceso',
+            'text' => 'Salidas',
+            'url'  => '/admin/salidas',
+        ],
+
+        [
+            'text' => 'Perfil',
             'url'  => '/change-password',
         ],
 

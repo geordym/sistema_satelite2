@@ -22,13 +22,6 @@ Route::match(['get', 'head'], '/', function () {
 Auth::routes();
 
 
-
-
-
-Route::get('canales/canales.xml', [App\Http\Controllers\CanalController::class, 'retornarXML'])->name('admin.canales.retornar');
-
-
-
 Route::middleware('auth')->group(function () {
 
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -39,17 +32,47 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/users', [App\Http\Controllers\UserController::class, 'users'])->name('admin.users');
     Route::post('/admin/users', [App\Http\Controllers\UserController::class, 'create'])->name('admin.users.create');
 
+    Route::resource('/admin/entradas', App\Http\Controllers\EntradaController::class)->only([
+        'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
+    ])->names([
+        'index' => 'admin.entradas.index',
+        'create' => 'admin.entradas.create',
+        'store' => 'admin.entradas.store',
+        'show' => 'admin.entradas.show',
+        'edit' => 'admin.entradas.edit',
+        'update' => 'admin.entradas.update',
+        'destroy' => 'admin.entradas.destroy',
+    ]);
 
-    /*CANALES ROUTES */
-    Route::get('/admin/canales/xml', [App\Http\Controllers\CanalController::class, 'generarXML'])->name('admin.canales.xml');
-    Route::delete('/admin/canales/delete/{id}', [App\Http\Controllers\CanalController::class, 'destroy'])->name('admin.canales.delete');
-    Route::get('/admin/canales', [App\Http\Controllers\CanalController::class, 'index'])->name('admin.canales');
-    Route::post('/admin/canales', [App\Http\Controllers\CanalController::class, 'create'])->name('admin.canales.create');
-    Route::get('/admin/canales/edit/{id}', [App\Http\Controllers\CanalController::class, 'edit'])->name('admin.canales.edit');
-    Route::put('/admin/canales/{id}', [App\Http\Controllers\CanalController::class, 'update'])->name('admin.canales.update');
+    Route::resource('/admin/procesos', App\Http\Controllers\ProcesoController::class)->only([
+        'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
+    ])->names([
+        'index' => 'admin.procesos.index',
+        'create' => 'admin.procesos.create',
+        'store' => 'admin.procesos.store',
+        'show' => 'admin.procesos.show',
+        'edit' => 'admin.procesos.edit',
+        'update' => 'admin.procesos.update',
+        'destroy' => 'admin.procesos.destroy',
+    ]);
 
-    Route::get('/admin/cajas/log', [App\Http\Controllers\CajaController::class, 'registroCajas'])->name('cajas.log');
-    Route::resource('/admin/cajas', CajaController::class);
+    Route::resource('/admin/salidas', App\Http\Controllers\SalidaController::class)->only([
+        'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
+    ])->names([
+        'index' => 'admin.salidas.index',
+        'create' => 'admin.salidas.create',
+        'store' => 'admin.salidas.store',
+        'show' => 'admin.salidas.show',
+        'edit' => 'admin.salidas.edit',
+        'update' => 'admin.salidas.update',
+        'destroy' => 'admin.salidas.destroy',
+    ]);
+
+
+
+
+
+
 
     /*CHANGE PASSWORD ROUTES */
     Route::get('/change-password', [App\Http\Controllers\ChangePasswordController::class, 'showChangePasswordForm'])->name('password.change');
