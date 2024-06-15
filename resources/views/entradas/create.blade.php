@@ -20,6 +20,12 @@
 </div>
 @endif
 
+@if (session('errors'))
+<div class="alert alert-danger">
+    {{ session('errors') }}
+</div>
+@endif
+
 
 <div class="container mt-3">
     <h2>Crear Entrada</h2>

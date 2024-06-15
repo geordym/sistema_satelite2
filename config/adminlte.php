@@ -320,6 +320,16 @@ return [
         ],
 
         [
+            'text' => 'Actividades',
+            'url'  => '/admin/actividades',
+        ],
+
+        [
+            'text' => 'Operadores',
+            'url'  => '/admin/operadores',
+        ],
+
+        [
             'text' => 'Perfil',
             'url'  => '/change-password',
         ],

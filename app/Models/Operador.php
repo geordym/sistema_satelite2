@@ -6,21 +6,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Actividad extends Model
+class Operador extends Model
 {
     use HasFactory;
 
-    protected $table = "actividades";
+    protected $table = "operadores";
 
 
     protected $fillable = [
-        'nombre',
-        'valor_unitario'
+        'nombre'
     ];
+
 
     public function procesos(): HasMany
     {
-        return $this->hasMany(Proceso::class, 'actividad_id');
+        return $this->hasMany(Proceso::class, 'operador_id');
     }
+
 
 }

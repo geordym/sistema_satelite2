@@ -24,12 +24,12 @@
 <div class="container mt-3">
 
     <div class="row">
-        <h1>Entradas en el sistema</h1>
+        <h1>Procesos en el sistema</h1>
 
     </div>
 
     <div class="row">
-        <h3>Visualizando entradas de la fecha: {{$fecha}}</h3>
+        <h3>Visualizando procesos de la fecha: {{$fecha}}</h3>
     </div>
 
     <div class="row">
@@ -45,8 +45,8 @@
     </div>
 
     <div class="row">
-        <a href="{{route('admin.entradas.create')}}" class="btn btn-primary">
-            Agregar Entrada
+        <a href="{{route('admin.procesos.create')}}" class="btn btn-primary">
+            Agregar Proceso
         </a>
 
 
@@ -56,26 +56,26 @@
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Actividad</th>
+                    <th>Operador</th>
                     <th>Descripcion</th>
                     <th>Cantidad</th>
                     <th>Fecha</th>
-                    <th>Estado</th>
                     <th>Acciones</th>
 
                 </tr>
             </thead>
             <tbody>
-                @foreach ($entradas as $entrada)
-                <td>{{ $entrada->id }}</td>
-                <td>{{ $entrada->descripcion }}</td>
-                <td>{{ $entrada->cantidad }}</td>
-                <td>{{ $entrada->fecha_entrada }}</td>
-                <td>{{ $entrada->estado }}</td>
+                @foreach ($procesos as $proceso)
+                <td>{{ $proceso->id }}</td>
+                <td>{{ $proceso->actividad->nombre }}</td>
+                <td>{{ $proceso->operador->nombre }}</td>
+                <td>{{ $proceso->descripcion }}</td>
+                <td>{{ $proceso->cantidad }}</td>
+                <td>{{ $proceso->fecha_procesado }}</td>
                 <td>
-                    <a class="btn btn-info" href="{{ route('admin.entradas.edit', $entrada->id) }}">Actualizar</a>
-                    <a class="btn btn-info" href="{{ route('admin.entradas.show', $entrada->id) }}">Ver</a>
-
-                    <form action="{{ route('admin.entradas.destroy', $entrada->id) }}" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta entrada?');" method="POST">
+                    <a class="btn btn-info" href="{{ route('admin.procesos.edit', $proceso->id) }}">Actualizar</a>
+                    <form action="{{ route('admin.procesos.destroy', $proceso->id) }}" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este proceso?');" method="POST">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">Eliminar</button>
@@ -106,7 +106,7 @@
         var fechaSeleccionada = document.getElementById('fecha').value;
 
         // Construir la URL con la fecha como parámetro
-        var url = "{{ route('admin.entradas.index') }}" + "?fecha=" + fechaSeleccionada;
+        var url = "{{ route('admin.procesos.index') }}" + "?fecha=" + fechaSeleccionada;
 
         // Redireccionar a la URL construida
         window.location.href = url;

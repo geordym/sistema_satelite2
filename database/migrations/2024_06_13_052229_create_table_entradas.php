@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('descripcion'); // Campo para la descripción
             $table->integer('cantidad'); // Campo para la cantidad
             $table->dateTime('fecha_entrada'); // Campo para la fecha de entrada
+            $table->string('estado'); // Campo para la descripción
             $table->timestamps(); // Campos created_at y updated_at para la fecha de creación y actualización
         });
 

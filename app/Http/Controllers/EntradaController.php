@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Entrada;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class EntradaController extends Controller
 {
@@ -54,11 +55,17 @@ class EntradaController extends Controller
     public function store(Request $request)
     {
         // Validar los datos del formulario
-        $request->validate([
+        $validatedData = Validator::make($request->all(), [
             'descripcion' => 'required|string|max:255',
             'cantidad' => 'required|integer|min:1',
             'fecha_entrada' => 'required|date',
         ]);
+
+        if ($validatedData->fails()) {
+            return redirect()->back()
+                ->withErrors($validatedData)
+                ->withInput();
+        }
 
         try {
             // Crear una nueva instancia del modelo Entrada con los datos del formulario
@@ -66,7 +73,7 @@ class EntradaController extends Controller
             $entrada->descripcion = $request->input('descripcion');
             $entrada->cantidad = $request->input('cantidad');
             $entrada->fecha_entrada = $request->input('fecha_entrada');
-
+            $entrada->estado = "recibido";
             // Guardar la entrada en la base de datos
             $entrada->save();
 
@@ -86,7 +93,9 @@ class EntradaController extends Controller
      */
     public function show($id)
     {
-        //
+        $entrada = Entrada::findOrFail($id);
+        return view('entradas.show', compact('entrada'));
+
     }
 
     /**
@@ -123,16 +132,23 @@ class EntradaController extends Controller
             $entrada = Entrada::findOrFail($id);
 
             // Validar los datos del formulario
-            $request->validate([
+            $validatedData = Validator::make($request->all(), [
                 'descripcion' => 'required|string|max:255',
                 'cantidad' => 'required|integer|min:1',
                 'fecha_entrada' => 'required|date',
             ]);
 
+            if ($validatedData->fails()) {
+                return redirect()->back()
+                    ->withErrors($validatedData)
+                    ->withInput();
+            }
+
             // Actualizar los datos de la entrada
             $entrada->descripcion = $request->input('descripcion');
             $entrada->cantidad = $request->input('cantidad');
             $entrada->fecha_entrada = $request->input('fecha_entrada');
+            $entrada->estado = $request->input('estado');
 
             // Guardar los cambios en la entrada
             $entrada->save();

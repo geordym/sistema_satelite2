@@ -51,13 +51,10 @@
             <input type="datetime-local" class="form-control" id="fecha_entrada" name="fecha_entrada" value="{{ \Carbon\Carbon::parse($entrada->fecha_entrada)->format('Y-m-d\TH:i') }}">
         </div>
 
+        <!-- Campo para la fecha de entrada -->
         <div class="form-group">
-            <label for="estado">Estado:</label>
-            <select class="form-control" id="estado" name="estado">
-                <option value="recibido" {{ $entrada->estado === 'recibido' ? 'selected' : '' }}>Recibido</option>
-                <option value="procesando" {{ $entrada->estado === 'procesando' ? 'selected' : '' }}>Procesando</option>
-                <option value="entregado" {{ $entrada->estado === 'entregado' ? 'selected' : '' }}>Entregado</option>
-            </select>
+            <label for="fecha_entrada">Fecha de Entrada:</label>
+            <input type="datetime-local" class="form-control" id="fecha_entrada" name="fecha_entrada" value="{{ \Carbon\Carbon::parse($entrada->fecha_entrada)->format('Y-m-d\TH:i') }}">
         </div>
 
         <!-- Botón para enviar el formulario -->

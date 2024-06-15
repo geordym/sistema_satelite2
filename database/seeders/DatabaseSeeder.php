@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 
 
 use App\Models\Canal;
+use App\Models\Operador;
 use App\Models\User;
 
 
@@ -59,6 +60,20 @@ class DatabaseSeeder extends Seeder
             'valor_unitario' => '20',
         ]);
 
+
+        Operador::create([
+            'nombre' => "GEORDY MONTENEGRO"
+        ]);
+
+
+        Operador::create([
+            'nombre' => "DAMARIS MOSQUERA"
+        ]);
+
+
+        Operador::create([
+            'nombre' => "EUDES MONTENEGRO"
+        ]);
 
     }
 }
