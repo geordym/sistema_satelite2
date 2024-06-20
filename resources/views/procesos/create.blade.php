@@ -83,7 +83,7 @@
 
 
         <!-- Botón para enviar el formulario -->
-        <button type="submit" class="btn btn-primary">Crear Entrada</button>
+        <button type="submit" class="btn btn-primary">Crear Proceso</button>
     </form>
 
 </div>

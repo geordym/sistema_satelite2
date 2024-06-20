@@ -20,7 +20,6 @@ class EntradaController extends Controller
         $fecha = $request->input('fecha') ?? $fecha_actual;
         $fecha_formateada = Carbon::parse($fecha)->format('Y-m-d');
 
-        //dd($fecha_formateada);
 
         // Obtener la fecha inicial (medianoche)
         $fecha_inicio = Carbon::parse($fecha)->startOfDay();
@@ -29,7 +28,16 @@ class EntradaController extends Controller
         $fecha_fin = Carbon::parse($fecha)->endOfDay();
 
         //dd($fecha);
-        $entradas = Entrada::whereBetween('fecha_entrada', [$fecha_inicio, $fecha_fin])->get();
+
+        if ($request->input('fecha')) {
+            $entradas = Entrada::whereBetween('fecha_entrada', [$fecha_inicio, $fecha_fin])
+                ->orderBy('fecha_entrada', 'DESC')
+                ->get();
+        } else {
+            $entradas = Entrada::orderBy('fecha_entrada', 'DESC')->get();
+        }
+
+
         return view('entradas.index')->with('entradas', $entradas)->with('fecha', $fecha);
     }
 
@@ -95,7 +103,6 @@ class EntradaController extends Controller
     {
         $entrada = Entrada::findOrFail($id);
         return view('entradas.show', compact('entrada'));
-
     }
 
     /**
@@ -170,7 +177,7 @@ class EntradaController extends Controller
     public function destroy($id)
     {
 
-      //  dd($id);
+        //  dd($id);
         try {
             // Buscar la entrada por su ID
             $entrada = Entrada::findOrFail($id);

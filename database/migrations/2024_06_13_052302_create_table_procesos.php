@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('actividad_id'); // Campo para la cantidad
             $table->unsignedBigInteger('operador_id'); // Campo para la cantidad
             $table->unsignedBigInteger('cantidad'); // Campo para la cantidad
-            $table->string('descripcion'); // Campo para la descripción
+            $table->string('descripcion')->nullable(); // Campo para la descripción
             $table->dateTime('fecha_procesado'); // Campo para la fecha de entrada
 
             $table->timestamps();

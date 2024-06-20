@@ -8,6 +8,21 @@
 @section('content')
 
 
+
+
+@if (session('success'))
+<div class="alert alert-success">
+    {{ session('success') }}
+</div>
+@endif
+
+@if (session('error'))
+<div class="alert alert-danger">
+    {{ session('error') }}
+</div>
+@endif
+
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8 offset-md-2">
@@ -31,6 +46,8 @@
                 </div>
                 <div class="card-footer">
                     <a href="{{ route('admin.entradas.index') }}" class="btn btn-secondary">Volver</a>
+                    <a class="btn btn-info" href="{{ route('admin.procesos.process', $entrada->id) }}">Agregar Proceso</a>
+
                 </div>
             </div>
 
@@ -51,6 +68,7 @@
                                 <th>Descripcion</th>
                                 <th>Cantidad</th>
                                 <th>Fecha</th>
+                                <th>Acciones</th>
 
                             </tr>
                         </thead>
@@ -62,7 +80,14 @@
                             <td>{{ $proceso->descripcion }}</td>
                             <td>{{ $proceso->cantidad }}</td>
                             <td>{{ $proceso->fecha_procesado }}</td>
-
+                            <td>
+                                <a class="btn btn-info" href="{{ route('admin.procesos.edit', $proceso->id) }}">Actualizar</a>
+                                <form action="{{ route('admin.procesos.destroy', $proceso->id) }}" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este proceso?');" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+                            </td>
                             </tr>
                             @endforeach
 

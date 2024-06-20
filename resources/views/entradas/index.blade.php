@@ -74,6 +74,7 @@
                 <td>
                     <a class="btn btn-info" href="{{ route('admin.entradas.edit', $entrada->id) }}">Actualizar</a>
                     <a class="btn btn-info" href="{{ route('admin.entradas.show', $entrada->id) }}">Ver</a>
+                    <a class="btn btn-info" href="{{ route('admin.procesos.process', $entrada->id) }}">Procesar</a>
 
                     <form action="{{ route('admin.entradas.destroy', $entrada->id) }}" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta entrada?');" method="POST">
                         @csrf

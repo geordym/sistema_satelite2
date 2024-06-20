@@ -71,7 +71,6 @@ class ProcesoController extends Controller
         try {
             // Validación de datos
             $validator = Validator::make($request->all(), [
-                'descripcion' => 'required|string|max:255',
                 'cantidad' => 'required|integer|min:1',
                 'fecha_procesado' => 'required|date', // Asegúrate de que coincida con el formato datetime-local
                 'actividad_id' => 'required|exists:actividades,id',
@@ -95,9 +94,14 @@ class ProcesoController extends Controller
 
             $proceso->save();
 
-            // Redireccionamiento a una ruta o vista
-            return redirect()->route('admin.procesos.index'); // Reemplaza 'nombre_de_la_ruta' por la ruta a la que quieras redirigir
+            $entrada = Entrada::find($proceso->entrada_id);
+            if ($entrada->estado === "recibido") {
+                $entrada->estado = "procesando";
+                $entrada->save();
+            }
 
+            // Redireccionamiento a una ruta o vista
+            return redirect()->route('admin.entradas.show', ['entrada' => $proceso->entrada_id]);
         } catch (Exception $e) {
             dd($e);
             // Manejo de la excepción
@@ -156,10 +160,32 @@ class ProcesoController extends Controller
             $proceso->delete();
 
             // Redireccionar a la página de entradas con un mensaje de éxito
-            return redirect()->route('admin.procesos.index')->with('success', 'Proceso eliminado correctamente.');
+            return redirect()
+                ->route('admin.entradas.show', ['entrada' => $proceso->entrada_id])
+                ->with('success', 'El proceso se elimino correctamente');
         } catch (\Exception $e) {
             // Si ocurre algún error, redireccionar con un mensaje de error
             return redirect()->back()->with('error', 'Error al eliminar el proceso: ' . $e->getMessage());
         }
+    }
+
+
+    public function process($entrada_id)
+    {
+
+        $actividades = Actividad::all();
+        $entradas = Entrada::where('estado', 'recibido')
+            ->where('id', $entrada_id)
+            ->orWhere('estado', 'procesando')
+            ->get();
+
+        $operadores = Operador::all();
+
+        $fecha_actual = Carbon::now();
+        return view('procesos.create')
+            ->with('fecha_actual', $fecha_actual)
+            ->with('actividades', $actividades)
+            ->with('entradas', $entradas)
+            ->with('operadores', $operadores);
     }
 }

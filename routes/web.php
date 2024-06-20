@@ -56,6 +56,10 @@ Route::middleware('auth')->group(function () {
         'destroy' => 'admin.procesos.destroy',
     ]);
 
+Route::get('/admin/procesos/{entrada_id}/process', [App\Http\Controllers\ProcesoController::class, 'process'])
+    ->name('admin.procesos.process');
+
+
     Route::resource('/admin/salidas', App\Http\Controllers\SalidaController::class)->only([
         'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
     ])->names([
