@@ -324,6 +324,13 @@ return [
             'url'  => '/admin/actividades',
         ],
 
+
+        [
+            'text' => 'Pagos',
+            'url'  => '/admin/pagos',
+        ],
+
+
         [
             'text' => 'Operadores',
             'url'  => '/admin/operadores',

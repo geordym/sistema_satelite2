@@ -73,6 +73,21 @@ Route::get('/admin/procesos/{entrada_id}/process', [App\Http\Controllers\Proceso
     ]);
 
 
+    Route::resource('/admin/pagos', App\Http\Controllers\PagoController::class)->only([
+        'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
+    ])->names([
+        'index' => 'admin.pagos.index',
+        'create' => 'admin.pagos.create',
+        'store' => 'admin.pagos.store',
+        'show' => 'admin.pagos.show',
+        'edit' => 'admin.pagos.edit',
+        'update' => 'admin.pagos.update',
+        'destroy' => 'admin.pagos.destroy',
+    ]);
+
+
+
+
 
 
 
