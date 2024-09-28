@@ -72,6 +72,13 @@ Route::get('/admin/procesos/{entrada_id}/process', [App\Http\Controllers\Proceso
         'destroy' => 'admin.salidas.destroy',
     ]);
 
+    Route::post('/admin/pagos/payment-process', [App\Http\Controllers\PagoController::class, 'create_payment'])
+    ->name('admin.pagos.payment_process');
+
+
+    Route::get('/admin/pagos/payment-download/{id}', [App\Http\Controllers\PagoController::class, 'download_payment'])
+    ->name('admin.pagos.download_payment');
+
 
     Route::resource('/admin/pagos', App\Http\Controllers\PagoController::class)->only([
         'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'

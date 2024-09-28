@@ -20,6 +20,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/pagos/info-download/{id}', [App\Http\Controllers\PagoController::class, 'getPaymentData']);
+
 
 
 
