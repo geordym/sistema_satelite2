@@ -6,12 +6,19 @@ PASSWORD=""
 HOST="localhost"        
 PROD_DB="sistema_satelite2"    
 
+# Archivo para guardar los nombres de las bases de datos clonadas
+CLONE_DB_FILE="databases_clones.txt"
+
 # Generar un nombre aleatorio para la nueva base de datos
 NEW_DB="clon_$(date +%s)_$RANDOM"
 
+# Ruta para almacenar el dump en la carpeta temporal
+TEMP_DIR="/c/Users/Hp/AppData/Local/Temp"
+DUMP_FILE="$TEMP_DIR/dump_produccion.sql"
+
 # Crear un dump de la base de datos de producción
 echo "Creando dump de la base de datos de producción..."
-mysqldump -u $USER -p$PASSWORD -h $HOST $PROD_DB > dump_produccion.sql
+"C:/xampp/mysql/bin/mysqldump" -u $USER -h $HOST $PROD_DB > "$DUMP_FILE"
 
 # Verificar si el dump fue creado con éxito
 if [ $? -eq 0 ]; then
@@ -23,7 +30,7 @@ fi
 
 # Crear la nueva base de datos
 echo "Creando la nueva base de datos '$NEW_DB'..."
-mysql -u $USER -p$PASSWORD -h $HOST -e "CREATE DATABASE $NEW_DB;"
+"C:/xampp/mysql/bin/mysql" -u $USER -h $HOST -e "CREATE DATABASE $NEW_DB;"
 
 # Verificar si la base de datos fue creada exitosamente
 if [ $? -eq 0 ]; then
@@ -35,7 +42,7 @@ fi
 
 # Restaurar el dump en la nueva base de datos
 echo "Restaurando dump en la nueva base de datos '$NEW_DB'..."
-mysql -u $USER -p$PASSWORD -h $HOST $NEW_DB < dump_produccion.sql
+"C:/xampp/mysql/bin/mysql" -u $USER -h $HOST $NEW_DB < "$DUMP_FILE"
 
 # Verificar si la restauración fue exitosa
 if [ $? -eq 0 ]; then
@@ -46,7 +53,10 @@ else
 fi
 
 # Borrar el archivo de dump para limpiar
-rm dump_produccion.sql
+rm "$DUMP_FILE"
+
+# Guardar el nombre de la nueva base de datos en el archivo
+echo "$NEW_DB" >> "$CLONE_DB_FILE"
 
 # Retornar el nombre de la nueva base de datos
 echo "La nueva base de datos es: $NEW_DB"
