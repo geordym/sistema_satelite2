@@ -6,9 +6,15 @@ use App\Models\Actividad;
 use App\Models\Operador;
 use App\Models\Pago;
 use App\Models\Proceso;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use FPDF;
+use Fpdf\Fpdf as FpdfFpdf;
+use Illuminate\Support\Facades\Http;
+
 
 class PagoController extends Controller
 {
@@ -71,15 +77,67 @@ class PagoController extends Controller
         ;
     }
 
-    public function download_payment($id){
-        $pago = Pago::find($id);
+    public function download_payment($id) {
+        // Ruta al script de Python
+        $endpoint_ticket = "http://localhost:5000/api/generar_ticket";
 
+        // Preparar los datos para enviar en la solicitud
+        $data = json_encode(['id_pago' => $id]);
 
+        // Inicializar cURL
+        $ch = curl_init($endpoint_ticket);
 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data)
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+        // Ejecutar la solicitud
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        // Manejar la respuesta
+        if ($http_code === 200) {
+            $response_data = json_decode($response, true);
+            $pdf_path = $response_data['pdf_path'];  // Ruta del PDF
+
+            // Verificar si el archivo existe
+            if (file_exists($pdf_path)) {
+                // Establecer las cabeceras para forzar la descarga
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/pdf');
+                header('Content-Disposition: attachment; filename="' . basename($pdf_path) . '"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($pdf_path));
+
+                // Limpiar el buffer de salida
+                ob_clean();
+                flush();
+
+                // Leer el archivo y enviarlo al navegador
+                readfile($pdf_path);
+                exit;
+            } else {
+                return "Error: El archivo no existe.";
+            }
+        } else {
+            // Manejar errores
+            return "Error al generar el ticket: " . $response;
+        }
     }
 
+
+
+
+
     public function getPaymentData($id){
-        $pago = Pago::with(['operador', 'procesos'])->where('id', $id)->first();
+        $pago = Pago::with(['operador', 'pagoProcesos'])->where('id', $id)->first();
         return json_encode($pago);
     }
 
@@ -119,7 +177,20 @@ class PagoController extends Controller
                     throw new Error("No se puede pagar un proceso ya pagado");
                 }
 
-                $pago->pagoProcesos()->create(['pago_id' => $pago->id, 'proceso_id' => $proceso_id]);
+                $total_proccess = $proceso->cantidad * $proceso->actividad->valor_unitario;
+
+                $pago->pagoProcesos()->create(
+                    ['pago_id' => $pago->id,
+                    'proceso_id' => $proceso_id,
+                    'actividad' => $proceso->actividad->nombre,
+                    'descripcion' => $proceso->descripcion,
+                    'fecha_procesado' => $proceso->fecha_procesado,
+                    'cantidad' => $proceso->cantidad,
+                    'valor_actividad' => $proceso->actividad->valor_unitario,
+                    'total' => $total_proccess
+                    ]
+                );
+
                 $proceso->status = "PAGADO";
                 $proceso->save();
             }
@@ -176,4 +247,5 @@ class PagoController extends Controller
     {
         //
     }
+
 }

@@ -15,6 +15,12 @@ class PagoProceso extends Model
     protected $fillable = [
         'pago_id',
         'proceso_id',
+        'actividad',
+        'descripcion',
+        'fecha_procesado',
+        'cantidad',
+        'valor_actividad',
+        'total'
     ];
 
 

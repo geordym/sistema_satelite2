@@ -1,120 +1,160 @@
-import argparse
 import requests
-import json
-from fpdf import FPDF
-import matplotlib.pyplot as plt
-from io import BytesIO
-import os  # Para obtener la ruta actual del script
-import tempfile  # Para crear un archivo temporal
+from reportlab.lib.pagesizes import A6  # Tamaño de papel A6
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
+import os
+import tempfile
+import uuid  # Importar el módulo uuid
+from flask import Flask, jsonify, request
 
-# Definir la URL base de la API
-API_URL = "http://192.168.200.107:8050"  # Cambia esto por tu URL real
+app = Flask(__name__)
 
-def get_report(year, month):
-    endpoint_report_payment = f"{API_URL}/api/reportes/ingresos/{year}/{month}"
-
-    try:
-        response = requests.get(endpoint_report_payment)
-
-        if response.status_code == 200:
-            payments = response.json()
-            return payments
-        else:
-            print(f"Error: No se pudo obtener los pagos. Código de respuesta: {response.status_code}")
-            return []
+def generar_ticket(id_pago):
+    # Definir la URL del endpoint
+    url = f'http://localhost/sistema_satelite2/public/api/pagos/info-download/{id_pago}'
     
-    except requests.exceptions.RequestException as e:
-        print(f"Error en la petición: {e}")
-        return []
-
-def generate_bar_chart(payments, year, month):
-    # Obtener el número total de días en el mes
-    from calendar import monthrange
-    num_days = monthrange(year, month)[1]  # Obtiene el número de días en el mes
-
-    # Inicializar el diccionario con todos los días del mes y valor 0
-    daily_income = {day: 0 for day in range(1, num_days + 1)}
-
-    # Organizar los ingresos por día del mes
-    for payment in payments:
-        date = payment['fecha']  # Asumimos que la fecha tiene el formato 'YYYY-MM-DD'
-        day = int(date.split('-')[2])  # Obtener el día
-        daily_income[day] += payment['monto']
-
-    # Ordenar los días y los ingresos
-    days = sorted(daily_income.keys())
-    incomes = [daily_income[day] for day in days]
-
-    # Crear el gráfico de barras
-    plt.figure(figsize=(12, 6))
-    plt.bar(days, incomes, color='blue')
-    plt.xlabel('Día del mes')
-    plt.ylabel('Ingresos')
-    plt.title(f'Ingresos por día - {year}/{month}')
-
-    # Guardar el gráfico en un archivo temporal
-    temp_image = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-    plt.savefig(temp_image.name, format='png')
-    plt.close()
-
-    return temp_image.name  # Retornar la ruta del archivo temporal
-
-def generate_pdf(payments, year, month):
-    # Obtener la ruta actual del script
-    current_dir = os.getcwd()
-
-    # Crear el PDF
-    pdf = FPDF()
-    pdf.add_page()
-
-    # Título del PDF
-    pdf.set_font("Arial", size=16, style='B')
-    pdf.cell(200, 10, f'Reporte de Ingresos - {year}/{month}', ln=True, align='C')
-
-    # Espacio
-    pdf.ln(10)
-
-    # Lista de pagos
-    pdf.set_font("Arial", size=12)
-    for payment in payments:
-        pdf.cell(200, 10, f"ID: {payment['id']}, Monto: {payment['monto']}, Fecha: {payment['fecha']}", ln=True)
-
-    # Insertar el gráfico de barras en el PDF
-    pdf.ln(10)
-    pdf.set_font("Arial", size=14, style='B')
-    pdf.cell(200, 10, "Gráfico de Ingresos por Día", ln=True, align='C')
-    pdf.ln(10)
-
-    # Generar el gráfico de barras y guardar en un archivo temporal
-    chart_path = generate_bar_chart(payments, year, month)
-
-    # Agregar el gráfico al PDF
-    pdf.image(chart_path, x=10, y=None, w=180)
-
-    # Guardar el PDF en la misma ruta donde está el script
-    output_filename = os.path.join(current_dir, f"reporte_ingresos_{year}_{month}.pdf")
-    pdf.output(output_filename)
-    print(f"PDF generado: {output_filename}")
-
-    # Eliminar el archivo temporal
-    os.remove(chart_path)
-
-if __name__ == "__main__":
-    # Crear el parser de argumentos
-    parser = argparse.ArgumentParser(description="Obtener reporte de pagos por año y mes y generar un PDF.")
+    # Hacer la solicitud GET al endpoint
+    response = requests.get(url)
     
-    # Añadir los argumentos de año y mes
-    parser.add_argument("year", type=int, help="El año del reporte (ej: 2024)")
-    parser.add_argument("month", type=int, help="El mes del reporte (ej: 9)")
+    if response.status_code == 200:
+        # Obtener los datos del JSON
+        data = response.json()
+        
+        # Crear un archivo PDF en la carpeta temporal
+        temp_dir = tempfile.gettempdir()
+        pdf_path = os.path.join(temp_dir, f'ticket_pago_{uuid.uuid4()}.pdf')  # Nombre aleatorio
+        
+        # Crear un canvas temporal para calcular la altura necesaria
+        temp_canvas = canvas.Canvas(pdf_path, pagesize=(58 * mm, 0))  # Inicialmente sin altura definida
+        temp_canvas.setFont("Helvetica", 10)
 
-    # Parsear los argumentos
-    args = parser.parse_args()
+        # Calcular la altura necesaria en función del contenido
+        line_height = 6 * mm
+        y_position = 0
 
-    # Obtener el reporte de pagos
-    payments = get_report(args.year, args.month)
+        # Espacios para la información principal
+        y_position += 5 * line_height  # Espacio para ID Pago
+        y_position += line_height  # Espacio para Operador
+        y_position += line_height  # Espacio para Método de Pago
+        y_position += line_height  # Espacio para Total
+        y_position += line_height  # Espacio para Fecha
+        y_position += line_height  # Espacio para Separador
+        y_position += line_height  # Espacio para "PROCESOS"
 
-    # Generar el PDF con la lista de pagos y el gráfico de barras
-    if payments:
-        generate_pdf(payments, args.year, args.month)
+        # Imprimir procesos
+        for proceso in data['pago_procesos']:
+            y_position += line_height  # Espacio para Proceso ID
+            y_position += line_height  # Espacio para Cantidad
+            y_position += line_height  # Espacio para Descripción
+            y_position += line_height  # Espacio para Valor Actividad
+            y_position += line_height  # Espacio para Total del Proceso
+            y_position += 10 * mm  # Espacio adicional entre procesos
+
+        # Definir la altura total del PDF
+        total_height = max(y_position, 100 * mm)  # Asegurar que sea al menos 100 mm de altura
+        
+        # Crear el PDF final con la altura calculada
+        c = canvas.Canvas(pdf_path, pagesize=(58 * mm, total_height))  # Establecer la altura calculada
+        c.setFont("Helvetica", 10)
+
+        # Dibujar un borde más pequeño
+        border_margin = 2 * mm  # Reducir el borde
+        c.rect(border_margin, border_margin, 58 * mm - 2 * border_margin, total_height - 2 * border_margin)  # (x, y, width, height)
+
+        # Título
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(10 * mm, total_height - 10 * mm, "TICKET DE PAGO")
+        
+        # Imprimir los datos en el PDF
+        c.setFont("Helvetica", 10)
+        y_position = total_height - 15 * mm  # Ajustar la posición Y para el texto
+
+        # ID Pago
+        c.drawString(10 * mm, y_position, "ID Pago:")
+        c.drawString(25 * mm, y_position, str(data['id']))
+        y_position -= line_height  # Salto de línea
+
+        # Operador
+        c.setFont("Helvetica", 10)  
+        c.drawString(10 * mm, y_position, "Operador:")
+        y_position -= line_height  # Salto de línea
+        c.setFont("Helvetica", 8)  
+        c.drawString(10 * mm, y_position, data['operador']['nombre'])
+        y_position -= line_height  # Espacio adicional
+
+        # Método de Pago
+        c.setFont("Helvetica", 10)  
+        c.drawString(10 * mm, y_position, "Método de Pago:")
+        y_position -= line_height  # Salto de línea
+        
+        c.setFont("Helvetica", 8)  
+        c.drawString(10 * mm, y_position, data['metodo_pago'])
+        y_position -= line_height  # Espacio adicional
+
+        # Total
+        c.setFont("Helvetica", 10)  
+        c.drawString(10 * mm, y_position, "Total:")
+        y_position -= line_height  # Salto de línea
+        
+        c.setFont("Helvetica", 8)  
+        c.drawString(10 * mm, y_position, f"${data['total']}")
+        y_position -= line_height  # Espacio adicional
+
+        # Fecha
+        c.drawString(10 * mm, y_position, "Fecha:")
+        y_position -= line_height  # Salto de línea
+        c.drawString(10 * mm, y_position, data['created_at'].split("T")[0])  # Solo la fecha
+        y_position -= line_height  # Espacio adicional
+
+        # Separador
+        c.drawString(10 * mm, y_position, "-" * 35)  # Separador
+        y_position -= 5 * mm  # Espacio adicional
+
+        # Título de procesos
+        c.drawString(10 * mm, y_position, "PROCESOS:")
+        y_position -= line_height  # Salto de línea
+        
+        # Cambiar estilos para procesos 
+        c.setFont("Helvetica", 8)  # Ajustar el tamaño de fuente si es necesario
+
+        # Imprimir procesos
+        for proceso in data['pago_procesos']:
+            c.drawString(10 * mm, y_position, f"Proceso ID: {proceso['id']}")
+            y_position -= line_height  # Salto de línea
+            c.drawString(10 * mm, y_position, f"Actividad: {proceso['actividad']}")
+            y_position -= line_height  # Salto de línea
+            c.drawString(10 * mm, y_position, f"Cantidad: {proceso['cantidad']}")
+            y_position -= line_height  # Salto de línea
+            c.drawString(10 * mm, y_position, f"Total: ${proceso['total']}")
+            y_position -= 2 * line_height  # Espaciado entre procesos
+            
+            c.drawString(10 * mm, y_position + 20, "-" * 35)  # Separador
+            y_position -= 2 * mm  # Espacio adicional
+
+        # Finalizar el PDF
+        c.save()
+        
+        # Retornar la ruta del PDF generado
+        return pdf_path
     else:
-        print("No hay pagos para generar el reporte.")
+        print("Error al obtener los datos:", response.status_code)
+        return None
+
+# Endpoint para generar el ticket
+@app.route('/api/generar_ticket', methods=['POST'])
+def crear_ticket():
+    data = request.json
+    id_pago = data.get('id_pago')
+
+    if not id_pago:
+        return jsonify({"error": "ID de pago es requerido"}), 400
+    
+    pdf_path = generar_ticket(id_pago)
+
+    if pdf_path:
+        return jsonify({"pdf_path": pdf_path}), 200
+    else:
+        return jsonify({"error": "No se pudo generar el ticket"}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

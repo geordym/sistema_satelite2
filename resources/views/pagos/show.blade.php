@@ -22,12 +22,7 @@
 </div>
 @endif
 
-@if (session('pago_creado'))
-<div class="alert alert-danger">
-    {{ session('pago_creado') }}
-    <a href="generar_ticket_pago?id=" class="btn btn-info">Generar ticket Pago</a>
-</div>
-@endif
+
 
 
 <div class="container mt-4">
@@ -69,19 +64,17 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Actividad</th>
-                                <th>Operador</th>
                                 <th>Descripción</th>
                                 <th>Cantidad</th>
                                 <th>Fecha</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($pago->procesos as $proceso)
+                            @foreach ($pago->pagoProcesos as $proceso)
                             <tr>
                                 <td>{{ $proceso->id }}</td>
-                                <td>{{ $proceso->actividad->nombre }}</td>
-                                <td>{{ $proceso->operador->nombre }}</td>
-                                <td>{{ $proceso->descripcion }}</td>
+                                <td>{{ $proceso->actividad }}</td>
+                                <td>{{ $proceso->descripcion}}</td>
                                 <td>{{ $proceso->cantidad }}</td>
                                 <td>{{ $proceso->fecha_procesado }}</td>
 
