@@ -44,8 +44,8 @@
                     <td>{{ $actividad->id }}</td>
                     <td>{{ $actividad->nombre }}</td>
                     <td>${{ number_format($actividad->valor_unitario, 2) }}</td>
-                    <td>{{ $operador->created_at ? $operador->created_at->format('d/m/Y H:i') : 'Fecha no disponible' }}</td>
-                    <td>{{ $operador->updated_at ? $operador->updated_at->format('d/m/Y H:i') : 'Fecha no disponible' }}</td>
+                    <td>{{ $actividad->created_at ? $actividad->created_at->format('d/m/Y H:i') : 'Fecha no disponible' }}</td>
+                    <td>{{ $actividad->updated_at ? $actividad->updated_at->format('d/m/Y H:i') : 'Fecha no disponible' }}</td>
 
                     <td>
                         <a href="{{ route('admin.actividades.show', $actividad->id) }}" class="btn btn-info btn-sm">Ver</a>
