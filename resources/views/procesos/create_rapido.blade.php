@@ -80,7 +80,7 @@
     </tbody>
 </table>
 
-<button class="btn btn-primary" onclick="enviarProcesos()">Guardar Procesos</button>
+<button id="btnEnviarProcesos" class="btn btn-primary" onclick="enviarProcesos()">Guardar Procesos</button>
 
 
 <script>
