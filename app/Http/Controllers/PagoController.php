@@ -199,8 +199,82 @@ class PagoController extends Controller
             return $pago->id;
         });
 
+        $this->sendMessageToPrinter($this->assembleMessageToPrinter($pago_creado));
+        $this->sendMessageToPrinter($this->assembleMessageToPrinter($pago_creado));
+
         return redirect()->route('admin.pagos.index')->with('success', 'Pago creado con éxito.')->with('pago_creado', $pago_creado);
     }
+
+    public function assembleMessageToPrinter($pagoId)
+    {
+        // Buscar el pago por ID
+        $pago = Pago::with('operador', 'pagoProcesos')->find($pagoId);
+
+        if (!$pago) {
+            return response()->json(['error' => 'Pago no encontrado'], 404);
+        }
+
+        // Construir la estructura JSON
+        $jsonData = [
+            "id" => $pago->id,
+            "operador" => [
+                "nombre" => $pago->operador->nombre
+            ],
+            "metodoPago" => $pago->metodo_pago,
+            "total" => $pago->total,
+            "createdAt" => $pago->created_at->toISOString(),
+            "pagoProcesos" => $pago->pagoProcesos->map(function ($pagoProceso) {
+                return [
+                    "id" => $pagoProceso->id,
+                    "actividad" => $pagoProceso->actividad,
+                    "cantidad" => $pagoProceso->cantidad,
+                    "total" => $pagoProceso->total
+                ];
+            })->toArray()
+        ];
+        return $jsonData;
+    }
+
+
+    public function sendMessageToPrinter($json)
+    {
+        $printerApiUrl = env('PRINTER_POS_API_URL', 'http://localhost:9001/api/print-ticket');
+
+        if (!$printerApiUrl) {
+            return response()->json(['error' => 'La URL de la impresora no está configurada'], 500);
+        }
+
+        // Inicializar cURL
+        $ch = curl_init($printerApiUrl);
+
+        // Configurar opciones de cURL
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($json));
+
+        // Ejecutar la solicitud
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+
+        // Cerrar cURL
+        curl_close($ch);
+
+        // Manejar errores o devolver la respuesta
+        if ($curlError) {
+            return response()->json(['error' => 'Error en la solicitud CURL: ' . $curlError], 500);
+        }
+
+        return response()->json([
+            'message' => 'Solicitud enviada correctamente',
+            'response' => json_decode($response, true),
+            'status' => $httpCode
+        ]);
+    }
+
 
     /**
      * Display the specified resource.
