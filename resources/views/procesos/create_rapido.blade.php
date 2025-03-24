@@ -141,12 +141,17 @@
 
 <script>
     function enviarProcesos() {
+        let botonEnviar = document.getElementById("btnEnviarProcesos"); // Referencia al botón
+
+        botonEnviar.disabled = true;
+        botonEnviar.innerText = "Enviando..."; // Cambia el texto del botón
+
         let tabla = document.getElementById("tablaProcesos");
         const descripcion = document.getElementById('descripcion');
         let filas = tabla.getElementsByTagName("tr");
         let procesos = [];
 
-        for (let i = 0; i < filas.length; i++) { 
+        for (let i = 0; i < filas.length; i++) {
             let fila = filas[i];
 
             let proceso = {
@@ -182,12 +187,19 @@
             .then(data => {
                 if (data.success) {
                     alert("Procesos guardados correctamente.");
+
                     location.reload(); // Recargar la página después de guardar
                 } else {
                     alert("Error: " + JSON.stringify(data.errors || data.error));
+                    botonEnviar.disabled = false; // Reactivar el botón en caso de error
+                    botonEnviar.innerText = "Enviar Procesos";
                 }
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => {
+                botonEnviar.disabled = false; // Reactivar el botón en caso de error
+                botonEnviar.innerText = "Enviar Procesos";
+                console.error("Error:", error)
+            });
     }
 </script>
 

@@ -26,7 +26,7 @@ class PagoController extends Controller
     public function index(Request $request)
     {
         $operadores = Operador::all();
-        $selectedOperator = $request->input('operador_id') ?? 0 ;
+        $selectedOperator = $request->input('operador_id') ?? 0;
 
         $pagos = Pago::all();
 
@@ -44,8 +44,8 @@ class PagoController extends Controller
         $operador = Operador::find($operador_id);
         $procesos_operador = $operador->procesos;
         $procesos_operador_unpayment = [];
-        foreach($procesos_operador as $proceso){
-            if($proceso->status !=="PAGADO"){
+        foreach ($procesos_operador as $proceso) {
+            if ($proceso->status !== "PAGADO") {
                 $procesos_operador_unpayment[] = $proceso;
             }
         }
@@ -56,87 +56,65 @@ class PagoController extends Controller
         return view('pagos.create')->with('operador', $operador)->with('procesos_operador', $procesos_operador_unpayment)->with('actividades', $actividades);
     }
 
-    public function create_payment(Request $request){
+    public function create_payment(Request $request)
+    {
         $operador_id = $request->input('operador_id');
         $procesos_ids = $request->input('selected_processes');
         $procesos_ids_array = explode(',', $procesos_ids);
         $processes_to_payment = Proceso::find($procesos_ids_array);
 
         $total_to_payment = 0;
-        foreach($processes_to_payment as $proccess){
+        foreach ($processes_to_payment as $proccess) {
             $total_to_payment += $proccess->calcularValor();
         }
 
         $operador = Operador::find($operador_id);
 
 
-        return view('pagos.create_payment')->with('operador',$operador)->
-        with('operador_procesos', $processes_to_payment)->
-        with('total_to_payment', $total_to_payment)->
-        with('procesos_ids', $procesos_ids)
+        return view('pagos.create_payment')->with('operador', $operador)->with('operador_procesos', $processes_to_payment)->with('total_to_payment', $total_to_payment)->with('procesos_ids', $procesos_ids)
         ;
     }
 
-    public function download_payment($id) {
-        // Ruta al script de Python
-        $endpoint_ticket = "http://localhost:5000/api/generar_ticket";
+    public function download_payment($id)
+    {
+        $endpoint_ticket = env('PRINTER_POS_API_URL', 'http://localhost:9001/api/print-ticket');
 
-        // Preparar los datos para enviar en la solicitud
-        $data = json_encode(['id_pago' => $id]);
-
-        // Inicializar cURL
-        $ch = curl_init($endpoint_ticket);
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Content-Length: ' . strlen($data)
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-
-        // Ejecutar la solicitud
-        $response = curl_exec($ch);
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        // Manejar la respuesta
-        if ($http_code === 200) {
-            $response_data = json_decode($response, true);
-            $pdf_path = $response_data['pdf_path'];  // Ruta del PDF
-
-            // Verificar si el archivo existe
-            if (file_exists($pdf_path)) {
-                // Establecer las cabeceras para forzar la descarga
-                header('Content-Description: File Transfer');
-                header('Content-Type: application/pdf');
-                header('Content-Disposition: attachment; filename="' . basename($pdf_path) . '"');
-                header('Expires: 0');
-                header('Cache-Control: must-revalidate');
-                header('Pragma: public');
-                header('Content-Length: ' . filesize($pdf_path));
-
-                // Limpiar el buffer de salida
-                ob_clean();
-                flush();
-
-                // Leer el archivo y enviarlo al navegador
-                readfile($pdf_path);
-                exit;
-            } else {
-                return "Error: El archivo no existe.";
-            }
-        } else {
-            // Manejar errores
-            return "Error al generar el ticket: " . $response;
+        if (!$endpoint_ticket) {
+            return response()->json(['error' => 'La URL del servicio de tickets no está configurada'], 500);
         }
+
+        $data = $this->assembleMessageToPrinter($id);
+
+        // Convertir el array de datos en formato JSON
+        $json_data = json_encode($data);
+
+        // Escapar las comillas dobles dentro del JSON para evitar problemas con el archivo BAT
+        $escaped_json_data = addslashes($json_data);
+
+        // Crear el contenido del archivo BAT
+        $bat_content = "@echo off\n";
+        $bat_content .= "curl -X POST \"$endpoint_ticket\" -H \"Content-Type: application/json\" -d \"$escaped_json_data\"\n";
+        $bat_content .= "pause\n";
+
+        // Definir el nombre del archivo
+        $filename = "ticket_pago_{$id}.bat";
+        $filepath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
+
+        // Guardar el archivo BAT en el servidor
+        file_put_contents($filepath, $bat_content);
+
+        // Enviar el archivo BAT como descarga y eliminarlo después de enviarlo
+        return response()->download($filepath, $filename)->deleteFileAfterSend(true);
     }
 
 
 
 
 
-    public function getPaymentData($id){
+
+
+    public function getPaymentData($id)
+    {
         $pago = Pago::with(['operador', 'pagoProcesos'])->where('id', $id)->first();
         return json_encode($pago);
     }
@@ -180,14 +158,15 @@ class PagoController extends Controller
                 $total_proccess = $proceso->cantidad * $proceso->actividad->valor_unitario;
 
                 $pago->pagoProcesos()->create(
-                    ['pago_id' => $pago->id,
-                    'proceso_id' => $proceso_id,
-                    'actividad' => $proceso->actividad->nombre,
-                    'descripcion' => $proceso->descripcion,
-                    'fecha_procesado' => $proceso->fecha_procesado,
-                    'cantidad' => $proceso->cantidad,
-                    'valor_actividad' => $proceso->actividad->valor_unitario,
-                    'total' => $total_proccess
+                    [
+                        'pago_id' => $pago->id,
+                        'proceso_id' => $proceso_id,
+                        'actividad' => $proceso->actividad->nombre,
+                        'descripcion' => $proceso->descripcion,
+                        'fecha_procesado' => $proceso->fecha_procesado,
+                        'cantidad' => $proceso->cantidad,
+                        'valor_actividad' => $proceso->actividad->valor_unitario,
+                        'total' => $total_proccess
                     ]
                 );
 
@@ -321,5 +300,4 @@ class PagoController extends Controller
     {
         //
     }
-
 }
