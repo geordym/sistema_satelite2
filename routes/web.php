@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::match(['get', 'head'], '/', function () {
-    // Redirige a la ruta '/home'
+Route::get('/', function () {
     return redirect('/home');
 });
+
 
 Auth::routes();
 
