@@ -60,8 +60,8 @@
 </div>
 
 
-<table border="1">
-    <thead>
+<table class="table table-striped table-bordered">
+    <thead class="thead-dark">
         <tr>
             <th>ID</th>
             <th>Operador</th>
@@ -77,12 +77,13 @@
             <td>{{ $pago->id }}</td>
             <td>{{ $pago->operador->nombre }}</td>
             <td>{{ $pago->metodo_pago }}</td>
-            <td>{{ $pago->total }}</td>
-            <td>{{ $pago->created_at }}</td>
+            <td>{{ number_format($pago->total, 2) }} COP</td>
+            <td>{{ $pago->created_at->format('d/m/Y H:i') }}</td>
             <td>
-            <a class="btn btn-info" href="{{ route('admin.pagos.show', $pago->id) }}">Visualizar Detalles</a>
+                <a class="btn btn-sm btn-info" href="{{ route('admin.pagos.show', $pago->id) }}">
+                    <i class="fas fa-eye"></i> Ver
+                </a>
             </td>
-
         </tr>
         @endforeach
     </tbody>

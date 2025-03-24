@@ -50,6 +50,15 @@
         </a>
 
 
+        <a href="{{route('admin.procesos.create_rapido')}}" class="btn btn-secondary">
+            Agregar Proceso Rapido
+        </a>
+
+        <a href="{{route('admin.procesos.visualizar_creados_recientemente')}}" class="btn btn-secondary">
+            Visualizar Proceso Rapido
+        </a>
+
+
     </div>
     <div class="row bg-white mt-3" style="max-height: 500px; overflow: auto;">
         <table class="table table-bordered">

@@ -9,6 +9,7 @@ use App\Models\Proceso;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ProcesoController extends Controller
@@ -58,6 +59,25 @@ class ProcesoController extends Controller
             ->with('actividades', $actividades)
             ->with('entradas', $entradas)
             ->with('operadores', $operadores);
+    }
+
+
+    public function create_rapido()
+    {
+        $actividades = Actividad::all();
+        $entradas = Entrada::where('estado', 'recibido')
+            ->orWhere('estado', 'procesando')
+            ->get();
+
+        $operadores = Operador::all();
+
+        $fecha_actual = Carbon::now();
+
+        return view('procesos.create_rapido')
+            ->with('fecha_actual', $fecha_actual)
+            ->with('actividades', $actividades)
+            ->with('entradas', $entradas)
+            ->with('operadores', $operadores);;
     }
 
     /**
@@ -110,6 +130,63 @@ class ProcesoController extends Controller
         }
     }
 
+
+    public function store_json(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'procesos' => 'required|array|min:1',
+                'procesos.*.cantidad' => 'required|integer|min:1',
+                'procesos.*.fecha_procesado' => 'required|date',
+                'procesos.*.actividad_id' => 'required|exists:actividades,id',
+                'procesos.*.entrada_id' => 'required|exists:entradas,id',
+                'procesos.*.operador_id' => 'required|exists:operadores,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            DB::beginTransaction();
+
+            foreach ($request->input('procesos') as $procesoData) {
+                $proceso = new Proceso();
+                $proceso->descripcion = $procesoData['descripcion'] ?? null;
+                $proceso->cantidad = $procesoData['cantidad'];
+                $proceso->fecha_procesado = $procesoData['fecha_procesado'];
+                $proceso->actividad_id = $procesoData['actividad_id'];
+                $proceso->entrada_id = $procesoData['entrada_id'];
+                $proceso->operador_id = $procesoData['operador_id'];
+                $proceso->save();
+
+                $entrada = Entrada::find($proceso->entrada_id);
+                if ($entrada->estado === "recibido") {
+                    $entrada->estado = "procesando";
+                    $entrada->save();
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Procesos guardados correctamente'
+            ], 201);
+        } catch (\Exception $e) {
+            // Revertir cambios si hubo un error
+            DB::rollBack();
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Hubo un problema al procesar la solicitud. ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+
     /**
      * Display the specified resource.
      *
@@ -129,7 +206,8 @@ class ProcesoController extends Controller
      */
     public function edit($id)
     {
-        //
+        $proceso = Proceso::find($id);
+        return view('procesos.edit')->with('proceso', $proceso);
     }
 
     /**
@@ -141,9 +219,32 @@ class ProcesoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        try {
+            // Validar la cantidad
+            $request->validate([
+                'cantidad' => 'required|integer|min:1',
+            ]);
+    
+            // Buscar el proceso
+            $proceso = Proceso::find($id);
+            if (!$proceso) {
+                return redirect()->route('admin.procesos.index')->with('error', 'El proceso no fue encontrado.');
+            }
+    
+            // Actualizar la cantidad
+            $proceso->cantidad = $request->cantidad;
+            $proceso->save();
+    
+            // Guardar mensaje en la sesión
+            session()->flash('success', 'Proceso actualizado correctamente.');
+    
+            return redirect()->route('admin.procesos.edit', $id);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Hubo un problema al actualizar el proceso. ' . $e->getMessage());
+        }
     }
-
+    
+    
     /**
      * Remove the specified resource from storage.
      *
@@ -188,4 +289,19 @@ class ProcesoController extends Controller
             ->with('entradas', $entradas)
             ->with('operadores', $operadores);
     }
+
+
+
+    public function visualizar_creados_recientemente()
+    {
+        $fecha_actual = Carbon::now()->toDateString(); // Obtiene solo la fecha (YYYY-MM-DD)
+    
+        $procesos = Proceso::with(['operador', 'actividad'])
+            ->whereDate('created_at', $fecha_actual) // Filtra solo por la fecha
+            ->get();
+    
+        return view('procesos.visualizar_creados_recientemente', compact('procesos'));
+    }
+
+
 }

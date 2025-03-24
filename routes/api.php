@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProcesoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/pagos/info-download/{id}', [App\Http\Controllers\PagoController::class, 'getPaymentData']);
+
+Route::post('/admin/procesos/create/rapido', [ProcesoController::class, 'store_json'])->name('admin.procesos.store_json');
 
 
 
